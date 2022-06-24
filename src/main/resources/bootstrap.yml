@@ -1,0 +1,51 @@
+spring:
+  profile: dev
+  application:
+    name: mf-circuit-braker
+
+server:
+  port: 8052
+
+gerador-boletos:
+  api:
+    baseurl: localhost:9292
+
+aws:
+  region: us-east-1
+  access_key: AKIAVDUESZEOPOI2B7QR
+  secret_key: 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
+  bucket:
+    name: resilience-boletos
+
+resilience4j:
+  retry:
+    instances:
+      geracao-arquivo-boleto-retry:
+        max-attempts: 3
+        wait-duration: 5s
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - feign.FeignException
+  circuitbreaker:
+    instances:
+      geracao-arquivo-boleto:
+        failureRateThreshold: 50
+        allowedNumberOfCallsInHalfOpenState: 5
+        maxWaitDurationInHalfOpenState: 60s
+        registerHealthIndicator: true
+        ringBufferSizeInClosedState: 7
+        ringBufferSizeInHalfOpenState: 5
+        waitDurationInOpenState: 30s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'health,prometheus'
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    prometheus:
+      enabled: true
