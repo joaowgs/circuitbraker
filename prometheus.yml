@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "geração-boletos-job"
+    metrics_path: "actuator/prometheus"
+    static_configs:
+      - targets: ["192.168.0.151:8052"]
+        labels:
+          application: "api-geracao-boletos"
